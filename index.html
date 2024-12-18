@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鍵管理システム</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function authenticate() {
+            const userId = document.getElementById('user-id').value;
+            const password = document.getElementById('password').value;
+
+            if (userId === 'skyz' && password === '2024') {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                alert('ログインIDまたはパスワードが間違っています。');
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>鍵管理システム</h1>
+    </header>
+
+    <main>
+        <!-- ログインセクション -->
+        <section id="login-section">
+            <h2>ログイン</h2>
+            <label for="user-id">ログインID:</label>
+            <input type="text" id="user-id" placeholder="ログインIDを入力">
+            <br>
+            <label for="password">パスワード:</label>
+            <input type="password" id="password" placeholder="パスワードを入力">
+            <br>
+            <button onclick="authenticate()">ログイン</button>
+        </section>
+
+        <!-- 鍵管理コンテンツ -->
+        <section id="main-content" style="display: none;">
+            <section id="status-section">
+                <h2>現在の鍵の状況</h2>
+                <p id="current-status">鍵は誰も借りていません。</p>
+            </section>
+
+            <section id="action-section">
+                <h2>鍵の操作</h2>
+                <label for="name-input">名前:</label>
+                <input type="text" id="name-input" placeholder="名前を入力してください">
+                <button id="borrow-button">鍵を借りる</button>
+                <button id="return-button">返却</button>
+                <button id="transfer-button">引継ぎ</button>
+            </section>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; skyz 鍵管理システム</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
