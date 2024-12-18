@@ -1,21 +1,19 @@
-// script.js
 let currentHolder = null; // 現在の鍵の所有者
 
-// 要素の取得
 const currentStatus = document.getElementById("current-status");
 const nameInput = document.getElementById("name-input");
 const borrowButton = document.getElementById("borrow-button");
 const returnButton = document.getElementById("return-button");
 const transferButton = document.getElementById("transfer-button");
 
-// ページロード時に保存データを復元
-window.addEventListener("load", () => {
-    currentHolder = localStorage.getItem("currentHolder"); // 保存されたデータを取得
+// ページロード時にサーバーから状態を取得
+window.addEventListener("load", async () => {
+    await fetchKeyStatus(); // サーバーから状態を取得
     updateStatus(); // 状態を更新
 });
 
 // 鍵を借りる処理
-borrowButton.addEventListener("click", () => {
+borrowButton.addEventListener("click", async () => {
     const name = nameInput.value.trim();
     if (!name) {
         alert("名前を入力してください。");
@@ -26,12 +24,12 @@ borrowButton.addEventListener("click", () => {
         return;
     }
     currentHolder = name;
-    saveState(); // 状態を保存
+    await updateKeyStatus(); // サーバーに状態を送信
     updateStatus();
 });
 
 // 鍵を返却する処理
-returnButton.addEventListener("click", () => {
+returnButton.addEventListener("click", async () => {
     if (!currentHolder) {
         alert("鍵は誰も借りていません。");
         return;
@@ -42,12 +40,12 @@ returnButton.addEventListener("click", () => {
         return;
     }
     currentHolder = null;
-    saveState(); // 状態を保存
+    await updateKeyStatus(); // サーバーに状態を送信
     updateStatus();
 });
 
 // 鍵を引き継ぐ処理
-transferButton.addEventListener("click", () => {
+transferButton.addEventListener("click", async () => {
     const name = nameInput.value.trim();
     if (!name) {
         alert("新しい借主の名前を入力してください。");
@@ -58,7 +56,7 @@ transferButton.addEventListener("click", () => {
         return;
     }
     currentHolder = name;
-    saveState(); // 状態を保存
+    await updateKeyStatus(); // サーバーに状態を送信
     updateStatus();
 });
 
@@ -72,7 +70,33 @@ function updateStatus() {
     nameInput.value = ""; // 入力欄をクリア
 }
 
-// 状態を保存する関数
-function saveState() {
-    localStorage.setItem("currentHolder", currentHolder); // 状態を保存
+// サーバーから状態を取得する関数
+async function fetchKeyStatus() {
+    try {
+        const response = await fetch('/key-status'); // サーバーから状態を取得
+        if (response.ok) {
+            const data = await response.json();
+            currentHolder = data.currentHolder;
+        }
+    } catch (error) {
+        console.error("状態の取得に失敗しました", error);
+    }
+}
+
+// サーバーに状態を送信して更新する関数
+async function updateKeyStatus() {
+    try {
+        const response = await fetch('/update-key-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ currentHolder: currentHolder })
+        });
+        if (!response.ok) {
+            throw new Error("状態の更新に失敗しました");
+        }
+    } catch (error) {
+        console.error("状態の更新に失敗しました", error);
+    }
 }
